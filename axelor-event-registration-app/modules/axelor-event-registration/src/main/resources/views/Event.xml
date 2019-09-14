@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+	<grid model="com.axelor.event.registration.db.Event" title="Event" name="event-grid">
+		<field name="reference" />
+		<field name="startDate" />
+		<field name="endDate" />
+		<field name="address" />
+		<field name="regOpenDate" />
+		<field name="regCloseDate" />
+		<field name="capacity" />
+		<field name="eventFees" />
+		<field name="description" />
+		<field name="totalEntry" />
+		<field name="amountCollected" />
+		<field name="totalDiscount" />
+	</grid>
+
+	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form" onSave="action-event-group-onchange-date,action-event-method-check-Dates">
+		<panel title="Event Details">
+			<field name="reference" />
+			<field name="startDate" onChange="action-event-group-onchange-date" />
+			<field name="endDate" readonlyIf="startDate == null" onChange="action-event-group-onchange-date,action-event-method-check-Dates" />	
+			<field name="regOpenDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates" readonlyIf="startDate == null || endDate == null" />
+			<field name="regCloseDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates" readonlyIf="startDate == null || endDate == null || regOpenDate == null" />
+			<field name="capacity" />
+			<field name="eventFees" onChange="action-event-method-calculate-discount" />
+		</panel>
+		<panel title="Discount Details">
+			<field name="discountList" readonlyIf="eventFees == 0.00" onChange="action-event-method-setDiscountList" colSpan="12" />
+		</panel>
+		<panel title="Event Registration Details">
+			<field name="eventRegistrationList" onChange="action-event-method-calculate-amount" colSpan="12" />
+		</panel>
+		<panel title="Description">
+			<field name="description" widget="html" colSpan="12" />
+		</panel>
+		<panel sidebar="true">
+			<field name="createdOn" />
+			<field name="updatedOn" />
+		</panel>
+		<panel sidebar="true" title="Calculations">
+			<field name="totalEntry" />
+			<field name="amountCollected" />
+			<field name="totalDiscount" />
+		</panel>
+		<panel title="Venue" sidebar="true">
+			<field name="address" />
+		</panel>
+	</form>
+	
+	<action-method name="action-event-method-calculate-amount">
+		<call class="com.axelor.eventregistration.web.EventController" method="calculateAmountField"/>
+	</action-method>
+	
+	<action-method name="action-event-method-check-Dates">
+		<call class="com.axelor.eventregistration.web.EventController" method="checkDates"/>
+	</action-method>
+	
+	<action-method name="action-event-method-setDiscountList">
+		<call class="com.axelor.eventregistration.web.EventController" method="setDiscountList"/>
+	</action-method>
+	
+	<action-method name="action-event-method-calculate-discount">
+		<call class="com.axelor.eventregistration.web.EventController" method="calculateDiscount"/>
+	</action-method>
+
+	<action-group name="action-event-group-onchange-date">
+		<action name="action-event-validate-onchange-startDate" if="startDate != null" />
+		<action name="action-event-validate-onchange-endDate" if="endDate != null" />
+		<action name="action-event-validate-onchange-regOpenDate" if="regOpenDate != null" />
+		<action name="action-event-validate-onchange-regCloseDate" if="regCloseDate != null" />
+	</action-group>
+
+	<action-validate name="action-event-validate-onchange-startDate">
+		<error message="Event Start Date Must Be In Future" if="eval: startDate &lt; LocalDateTime.now();" />
+	</action-validate>
+
+	<action-validate name="action-event-validate-onchange-endDate">
+		<error message="Event End Date Must Be In Future" if="eval: endDate &lt; LocalDateTime.now();" />
+	</action-validate>
+
+	<action-validate name="action-event-validate-onchange-regOpenDate">
+		<error message="Registration Open Date Must Be In Future" if="eval: regOpenDate &lt; LocalDate.now();" />
+	</action-validate>
+	
+	<action-validate name="action-event-validate-onchange-regCloseDate">
+		<error message="Registration Close Date Must Be In Future" if="eval: regCloseDate &lt; LocalDate.now();" />
+	</action-validate>
+	
+</object-views>

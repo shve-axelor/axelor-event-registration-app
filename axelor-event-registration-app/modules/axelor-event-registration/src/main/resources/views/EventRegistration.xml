@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+	<grid model="com.axelor.event.registration.db.EventRegistration" title="Event Registration"
+		name="event-registration-grid">
+		<field name="event" />
+		<field name="name" />
+		<field name="email" />
+		<field name="address" />
+		<field name="registrationDate" />
+		<field name="amount" />
+	</grid>
+
+	<form model="com.axelor.event.registration.db.EventRegistration" title="Event Registration"
+		name="event-registration-form" onNew="action-event-method-event-registration-setEventField">
+		<panel title="Event Registration Details">		
+			<field name="name" />
+			<field name="email" />	
+			<field name="registrationDate" />
+			<field name="amount" />
+		</panel>
+		<panel  title="Address Details">
+			<field name="address" />
+		</panel>
+		<panel sidebar="true">
+			<field name="createdOn" />
+			<field name="updatedOn" />
+		</panel>
+		<panel sidebar="true" name="eventDetails" title="Event Details">
+			<field name="event" />
+		</panel>
+		
+	</form>
+	
+	<action-method name="action-event-method-event-registration-setEventField">
+		<call class="com.axelor.eventregistration.web.EventRegistrationController" method="setEventField"/>
+	</action-method>
+</object-views>
