@@ -2,7 +2,6 @@ package com.axelor.eventregistration.web;
 
 import java.time.Period;
 import java.util.List;
-
 import com.axelor.db.JpaSupport;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
@@ -104,5 +103,13 @@ public class EventController extends JpaSupport {
 		Event event = request.getContext().asType(Event.class);
 		eventService.calculateTotalFields(event);
 		response.setValues(event);
+	}
+	
+	public void importEventRegistration(ActionRequest request, ActionResponse response) {
+		Event event = request.getContext().asType(Event.class);
+//		importConfiguration importConfiguration = new ImportConfiguration();
+//	      importConfiguration.setBindMetaFile(metaFiles.upload(configXmlFile));
+//	      importConfiguration.setDataMetaFile(metaFiles.upload(dataCsvFile));
+	//	importer.run();
 	}
 }

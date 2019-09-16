@@ -19,7 +19,15 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
-		onSave="action-event-group-onchange-date,action-event-method-check-Dates,action-event-method-validateCapacity" onLoad="action-event-method-count-totalEntrys">
+		onSave="action-event-group-onchange-date,action-event-method-check-Dates,action-event-method-validateCapacity"
+		onLoad="action-event-method-count-totalEntrys">
+		<toolbar>
+			<button name="importRegistrationBtn" title="Import Registration"
+			readonlyIf="!id" onClick="action-event-view-import-registration-popup"	/>
+			<button name="btn-print-event-report" showIf="id"
+				onClick="action-event-registration-event-report-print"
+				title="Print" />
+		</toolbar>
 		<panel title="Event Details">
 			<field name="reference" onChange="save" />
 			<field name="startDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates,save" />
@@ -37,7 +45,7 @@
 		<panel title="Event Registration Details">
 			<field name="eventRegistrationList"
 				readonlyIf="reference == null || eventFees == 0.00 || startDate == null || endDate ==  null || regOpenDate == null || regCloseDate == null"
-				colSpan="12"  onChange="action-event-method-checkEventRegistrationList" />
+				colSpan="12" onChange="action-event-method-checkEventRegistrationList" />
 		</panel>
 		<panel title="Description">
 			<field name="description" widget="html" colSpan="12" />
@@ -55,9 +63,9 @@
 			<field name="address" />
 		</panel>
 	</form>
-	
+
 	<action-method name="action-event-method-count-totalEntrys">
-		<call class="com.axelor.eventregistration.web.EventController" method="setTotalEntrys"/>
+		<call class="com.axelor.eventregistration.web.EventController" method="setTotalEntrys" />
 	</action-method>
 
 	<action-method name="action-event-method-checkEventRegistrationList">
@@ -102,5 +110,36 @@
 	<action-validate name="action-event-validate-onchange-regCloseDate">
 		<error message="Registration Close Date Must Be In Future" if="eval: regCloseDate &lt; LocalDate.now();" />
 	</action-validate>
+	
+	<form name="wizard-import-registration-form" title="Import Registration"
+		model="com.axelor.event.registration.db.Wizard">
+		<panel name="wizardPanel">
+			<field name="metaFile" title="Input file" type="many-to-one"
+				target="com.axelor.meta.db.MetaFile" widget="binary-link" />
+			<button name="importBtn" colSpan="4" title="Import"
+				readonlyIf="metaFile == null" onClick="action-event-method-import-registration" />
+		</panel>
+	</form>
+	
+	<action-view name="action-event-view-import-registration-popup"
+		title="Import Registration" model="com.axelor.event.registration.db.Wizard">
+		<view type="form" name="wizard-import-registration-form" />
+		<view-param name="show-toolbar" value="false" />
+		<view-param name="width" value="800" />
+		<view-param name="popup" value="true" />
+		<view-param name="show-confirm" value="false" />
+		<view-param name="popup-save" value="false" />
+		<view-param name="popup" value="reload" />
+	</action-view>
+	
+	<action-method name="action-event-method-import-registration">
+		<call class="com.axelor.eventregistration.web.EventController" method="importEventRegistration" />
+	</action-method>
+	
+	<action-report output="in-${date}${time}" name="action-event-registration-event-report-print"
+		design="Event.rptdesign" format="pdf">
+		<param name="eventId" expr="eval: id" />
+	<!-- 	<param name="attachment" expr="eval: attachment" /> -->
+	</action-report>
 
 </object-views>
