@@ -6,16 +6,16 @@
 
 	<entity name="Event">
 		<string name="reference" required="true" namecolumn="true" title="Reference" />
-		<datetime name="startDate" title="Start Date" />
-		<datetime name="endDate" title="End Date" />
+		<datetime name="startDate" required="true" title="Start Date" />
+		<datetime name="endDate" required="true" title="End Date" />
 		<many-to-one name="address" ref="com.axelor.event.registration.db.Address" title="Venue" />
-		<date name="regOpenDate" title="Registration Open" />
-		<date name="regCloseDate" title="Registration Close" />
-		<integer name="capacity" title="Capacity" />
+		<date name="regOpenDate" required="true" title="Registration Open" />
+		<date name="regCloseDate" required="true" title="Registration Close" />
+		<integer name="capacity" min="0" title="Capacity" />
 		<decimal name="eventFees" min="0" title="Event fees" />
 		<string name="description" title="Description" />
 		<one-to-many name="discountList" title="Discounts" ref="com.axelor.event.registration.db.Discount"/>
-		<one-to-many name="eventRegistrationList" title="Event Registrations" ref="com.axelor.event.registration.db.EventRegistration"/>
+		<one-to-many name="eventRegistrationList" title="Event Registrations" mappedBy="event" ref="com.axelor.event.registration.db.EventRegistration"/>
 		<integer name="totalEntry" title="Total Entry" readonly="true" />
 		<decimal name="amountCollected" title="Amount Collected" readonly="true" />
 		<decimal name="totalDiscount" title="Total Discount" readonly="true" />

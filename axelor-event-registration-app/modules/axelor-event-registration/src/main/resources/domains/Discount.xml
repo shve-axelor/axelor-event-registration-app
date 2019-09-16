@@ -5,7 +5,7 @@
 	<module package="com.axelor.event.registration.db" name="event-registration" />
 	
 	<entity name="Discount">
-		<integer name="beforeDays" title="Before Days" />
+		<integer name="beforeDays" min="0" title="Before Days" />
 		<decimal name="discountPercent" min="0" max="100" title="Discount Percent" />
 		<decimal name="discountAmount" readonly="true" title="Discount Amount" />
 	</entity>

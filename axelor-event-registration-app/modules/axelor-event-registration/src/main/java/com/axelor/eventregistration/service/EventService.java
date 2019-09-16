@@ -6,5 +6,6 @@ public interface EventService {
 	public boolean checkEndDate(Event event);
 	public boolean checkRegOpenDate(Event event);
 	public boolean checkRegCloseDate(Event event);
-	public int calculateAmount(Event event);
+	public int setDiscountList(Event event);
+	public Event calculateTotalFields(Event event);
 }

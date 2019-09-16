@@ -1,12 +1,11 @@
 package com.axelor.eventregistration.web;
 
-import java.math.BigDecimal;
 import java.time.Period;
 import java.util.List;
 
 import com.axelor.db.JpaSupport;
-import com.axelor.event.registration.db.Discount;
 import com.axelor.event.registration.db.Event;
+import com.axelor.event.registration.db.EventRegistration;
 import com.axelor.eventregistration.service.EventService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -19,22 +18,15 @@ public class EventController extends JpaSupport {
 
 	public void checkDates(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
-		if (event.getEndDate() != null && event.getStartDate() != null) {
+		if (event.getStartDate() != null && event.getEndDate() != null) {
 			if (eventService.checkEndDate(event)) {
 				response.setError("End Date Must be Greater Than Start Date");
-			} else {
-				if (event.getRegOpenDate() != null) {
-					if (eventService.checkRegOpenDate(event)) {
-						response.setError("Registration Open Date Must be Less Than Event Start Date");
-					} else {
-						if (event.getRegCloseDate() != null) {
-							if (eventService.checkRegCloseDate(event)) {
-								response.setError(
-										"Registration Close Date Must be Grater Than Registration Open Date And Less Than Event Start Date");
-							}
-						}
-					}
-				}
+			} else if (event.getRegOpenDate() != null && eventService.checkRegOpenDate(event)) {
+				response.setError("Registration Open Date Must be Less Than Event Start Date");
+			} else if (event.getRegCloseDate() != null && event.getRegOpenDate() != null
+					&& eventService.checkRegCloseDate(event)) {
+				response.setError(
+						"Registration Close Date Must be Grater Than Registration Open Date And Less Than Event Start Date");
 			}
 		}
 	}
@@ -48,47 +40,69 @@ public class EventController extends JpaSupport {
 
 	public void setDiscountList(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
+		Period period = Period.between(event.getRegOpenDate(), event.getRegCloseDate());
 		if (event.getRegOpenDate() != null && event.getRegCloseDate() != null) {
-			Period period = Period.between(event.getRegOpenDate(), event.getRegCloseDate());
-			List<Discount> discountList = event.getDiscountList();
-			Discount discount = new Discount();
-			int flag = 0;
-			for (Discount discounts : discountList) {
-				if (discounts.getBeforeDays() > period.getDays()) {
-					discount = discounts;
-					flag = 1;
-					break;
-				} else {
-					BigDecimal total = discounts.getDiscountPercent().multiply(event.getEventFees());
-					discounts.setDiscountAmount(total.divide(BigDecimal.valueOf(100)));
-				}
-			}
-			discountList.remove(discount);
-			event.setDiscountList(discountList);
+			int flag = eventService.setDiscountList(event);
 			response.setValues(event);
 			if (flag == 1) {
 				response.setFlash("Before Days not greater than " + period.getDays());
 			}
-
+		}
+		if (event.getDiscountList() != null && !event.getDiscountList().isEmpty()) {
+			response.setAttr("startDate", "readonly", true);
+			response.setAttr("regOpenDate", "readonly", true);
+			response.setAttr("regCloseDate", "readonly", true);
 		} else {
-			response.setValue("discountList", null);
-			response.setFlash("Please Fill Registration Open And Close Date First.");
+			response.setAttr("startDate", "readonly", false);
+			response.setAttr("regOpenDate", "readonly", false);
+			response.setAttr("regCloseDate", "readonly", false);
 		}
 	}
 
-	public void calculateAmountField(ActionRequest request, ActionResponse response) {
+	public void checkEventRegistrationList(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
-		int totalRegistrations = event.getEventRegistrationList().size();
-		if (totalRegistrations > event.getCapacity()) {
+		List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
+		EventRegistration eventRegistration1 = new EventRegistration();
+		int totalRegistrations = 0;
+		if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
+			totalRegistrations = event.getEventRegistrationList().size() - 1;
+		}
+		if (totalRegistrations == event.getCapacity() || event.getCapacity() == 0) {
 			response.setFlash("Total Number Of Registrations Are Exceeds Capacity");
-			event.getEventRegistrationList().remove(totalRegistrations - 1);
+			eventRegistration1 = eventRegistrations.get(totalRegistrations);
 		} else {
-			int flag = eventService.calculateAmount(event);
-			if (flag == 1) {
-				response.setFlash("Registration Date For event Must Be In Between Registration Period");
+			for (EventRegistration eventRegistration : eventRegistrations) {
+				Period endPeriod = Period.between(eventRegistration.getRegistrationDate().toLocalDate(),
+						event.getRegCloseDate());
+				Period startPeriod = Period.between(event.getRegOpenDate(),
+						eventRegistration.getRegistrationDate().toLocalDate());
+				if (endPeriod.getDays() < 0 || startPeriod.getDays() < 0) {
+					eventRegistration1 = eventRegistration;
+				}
 			}
 		}
+		eventRegistrations.remove(eventRegistration1);
+		/*
+		 * if(eventRegistrations != null && !eventRegistrations.isEmpty()) {
+		 * response.setAttr("discountList", "readonly", true); }
+		 */
+		eventService.calculateTotalFields(event);
 		response.setValues(event);
 	}
 
+	public void validateEventCapacity(ActionRequest request, ActionResponse response) {
+		Event event = request.getContext().asType(Event.class);
+		if (event.getCapacity() != null && event.getEventRegistrationList() != null
+				&& !event.getEventRegistrationList().isEmpty()
+				&& event.getCapacity() < event.getEventRegistrationList().size()) {
+			response.setError("Capacity Cannot Set Less Than Total Number of Entrys.");
+		}
+		response.setValues(event);
+	}
+	
+	public void setTotalEntrys(ActionRequest request, ActionResponse response) {
+		Event event = request.getContext().asType(Event.class);
+		eventService.calculateTotalFields(event);
+		response.setValues(event);
+	}
 }
