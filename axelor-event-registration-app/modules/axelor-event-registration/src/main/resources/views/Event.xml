@@ -19,7 +19,7 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
-		onSave="action-event-group-onchange-date,action-event-method-check-Dates,action-event-method-validateCapacity"
+		onSave="action-event-group-onchange-date,action-event-method-check-Dates"
 		onLoad="action-event-method-count-totalEntrys">
 		<toolbar>
 			<button name="btn-import-event-registrationBtn" title="Import Registration" readonlyIf="!id"
@@ -34,7 +34,7 @@
 			<field name="endDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates" />
 			<field name="regOpenDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates" />
 			<field name="regCloseDate" onChange="action-event-group-onchange-date,action-event-method-check-Dates" />
-			<field name="capacity" onChange="action-event-method-validateCapacity" />
+			<field name="capacity" />
 			<field name="eventFees" onChange="action-event-method-calculate-discount" />
 		</panel>
 		<panel title="Discount Details">
@@ -76,10 +76,6 @@
 
 	<action-method name="action-event-method-checkEventRegistrationList">
 		<call class="com.axelor.eventregistration.web.EventController" method="checkEventRegistrationList" />
-	</action-method>
-
-	<action-method name="action-event-method-validateCapacity">
-		<call class="com.axelor.eventregistration.web.EventController" method="validateEventCapacity" />
 	</action-method>
 
 	<action-method name="action-event-method-check-Dates">

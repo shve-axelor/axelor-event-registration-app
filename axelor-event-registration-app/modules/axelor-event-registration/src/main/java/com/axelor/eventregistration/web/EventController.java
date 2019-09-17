@@ -1,7 +1,5 @@
 package com.axelor.eventregistration.web;
 
-import java.time.Period;
-import java.util.List;
 import com.axelor.db.JpaSupport;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
@@ -9,6 +7,8 @@ import com.axelor.eventregistration.service.EventService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.inject.Inject;
+import java.time.Period;
+import java.util.List;
 
 public class EventController extends JpaSupport {
 
@@ -27,6 +27,11 @@ public class EventController extends JpaSupport {
 				response.setError(
 						"Registration Close Date Must be Grater Than Registration Open Date And Less Than Event Start Date");
 			}
+		}
+		if (event.getCapacity() != null && event.getEventRegistrationList() != null
+				&& !event.getEventRegistrationList().isEmpty()
+				&& event.getCapacity() < event.getEventRegistrationList().size()) {
+			response.setError("Capacity Cannot Set Less Than Total Number of Entrys.");
 		}
 	}
 
@@ -89,27 +94,17 @@ public class EventController extends JpaSupport {
 		response.setValues(event);
 	}
 
-	public void validateEventCapacity(ActionRequest request, ActionResponse response) {
-		Event event = request.getContext().asType(Event.class);
-		if (event.getCapacity() != null && event.getEventRegistrationList() != null
-				&& !event.getEventRegistrationList().isEmpty()
-				&& event.getCapacity() < event.getEventRegistrationList().size()) {
-			response.setError("Capacity Cannot Set Less Than Total Number of Entrys.");
-		}
-		response.setValues(event);
-	}
-	
 	public void setTotalEntrys(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
 		eventService.calculateTotalFields(event);
 		response.setValues(event);
 	}
-	
+
 	public void importEventRegistration(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
-//		importConfiguration importConfiguration = new ImportConfiguration();
-//	      importConfiguration.setBindMetaFile(metaFiles.upload(configXmlFile));
-//	      importConfiguration.setDataMetaFile(metaFiles.upload(dataCsvFile));
-	//	importer.run();
+		// importConfiguration importConfiguration = new ImportConfiguration();
+		// importConfiguration.setBindMetaFile(metaFiles.upload(configXmlFile));
+		// importConfiguration.setDataMetaFile(metaFiles.upload(dataCsvFile));
+		// importer.run();
 	}
 }
