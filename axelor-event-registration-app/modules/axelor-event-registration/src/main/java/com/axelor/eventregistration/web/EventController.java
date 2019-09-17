@@ -1,5 +1,8 @@
 package com.axelor.eventregistration.web;
 
+import com.axelor.data.ImportTask;
+import com.axelor.data.Importer;
+import com.axelor.data.csv.CSVImporter;
 import com.axelor.db.JpaSupport;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
@@ -7,6 +10,9 @@ import com.axelor.eventregistration.service.EventService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.inject.Inject;
+
+import java.io.File;
+import java.io.IOException;
 import java.time.Period;
 import java.util.List;
 
@@ -101,10 +107,8 @@ public class EventController extends JpaSupport {
 	}
 
 	public void importEventRegistration(ActionRequest request, ActionResponse response) {
-		Event event = request.getContext().asType(Event.class);
-		// importConfiguration importConfiguration = new ImportConfiguration();
-		// importConfiguration.setBindMetaFile(metaFiles.upload(configXmlFile));
-		// importConfiguration.setDataMetaFile(metaFiles.upload(dataCsvFile));
-		// importer.run();
+		// Event event = request.getContext().asType(Event.class);
+		Importer importer = new CSVImporter("event-registration.xml","data/csv-multi");
+		importer.run();
 	}
 }
