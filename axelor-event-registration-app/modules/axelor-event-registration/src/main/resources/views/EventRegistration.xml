@@ -18,7 +18,9 @@
 		onSave="action-event-method-validateEventRegistration">
 		<panel title="Event Registration Details">
 			<field name="name" />
-			<field name="email" widget="email" />
+			<field name="email"
+				pattern="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@+[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"
+				widget="Email" placeholder="user@mydomain.com" />
 			<field name="registrationDate" onChange="action-event-method-calculate-amount" />
 			<field name="event" onChange="action-event-method-validateEventRegistration" />
 		</panel>

@@ -26,7 +26,8 @@
 				onClick="action-event-view-import-registration-popup" />
 			<button name="btn-print-event-report" showIf="id"
 				onClick="action-event-registration-event-report-print" title="Print" />
-			<!-- <button name="btn-"/> -->
+			<button name="sendByEmailBtn" title="Send email" icon="fa-envelope"
+			onClick="action-send-by-email-with-template,save" />
 		</toolbar>
 		<panel title="Event Details">
 			<field name="reference" />
@@ -67,6 +68,9 @@
 		</panel>
 		<panel title="Venue" sidebar="true">
 			<field name="address" />
+		</panel>
+		<panel sidebar="true">
+			<field name="emailSent" />
 		</panel>
 	</form>
 

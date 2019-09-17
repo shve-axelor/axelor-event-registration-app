@@ -19,5 +19,6 @@
 		<integer name="totalEntry" title="Total Entry" readonly="true" />
 		<decimal name="amountCollected" title="Amount Collected" readonly="true" />
 		<decimal name="totalDiscount" title="Total Discount" readonly="true" />
+		<boolean name="emailSent" title="Email Sent" readonly="true" default="false" />
 	</entity>
 </domain-models>
