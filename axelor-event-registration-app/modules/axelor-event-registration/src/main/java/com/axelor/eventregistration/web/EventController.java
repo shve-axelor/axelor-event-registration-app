@@ -44,6 +44,19 @@ public class EventController extends JpaSupport {
 				&& event.getCapacity() < event.getEventRegistrationList().size()) {
 			response.setError("Capacity Cannot Set Less Than Total Number of Entrys.");
 		}
+		if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
+			int totalRegistrations = 0;
+			totalRegistrations = event.getEventRegistrationList().size() - 1;
+
+			if (totalRegistrations == event.getCapacity() || event.getCapacity() == 0) {
+				response.setError("Total Number Of Registrations Are Exceeds Capacity");
+			}
+			for (EventRegistration eventRegistration : event.getEventRegistrationList()) {
+				if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
+					response.setError("Registration Date For event Must Be In Between Registration Period");
+				}
+			}
+		}
 	}
 
 	public void calculateDiscount(ActionRequest request, ActionResponse response) {
@@ -87,11 +100,7 @@ public class EventController extends JpaSupport {
 			eventRegistration1 = eventRegistrations.get(totalRegistrations);
 		} else {
 			for (EventRegistration eventRegistration : eventRegistrations) {
-				Period endPeriod = Period.between(eventRegistration.getRegistrationDate().toLocalDate(),
-						event.getRegCloseDate());
-				Period startPeriod = Period.between(event.getRegOpenDate(),
-						eventRegistration.getRegistrationDate().toLocalDate());
-				if (endPeriod.getDays() < 0 || startPeriod.getDays() < 0) {
+				if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
 					eventRegistration1 = eventRegistration;
 				}
 			}
@@ -103,11 +112,11 @@ public class EventController extends JpaSupport {
 
 	public void setTotalEntrys(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
-		if(event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
+		if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
 			List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
-			for(EventRegistration eventregistration: eventRegistrations) {
+			for (EventRegistration eventregistration : eventRegistrations) {
 				eventRegistrationService.calculateAmount(event, eventregistration);
-			}	
+			}
 		}
 		eventService.calculateTotalFields(event);
 		response.setValues(event);
