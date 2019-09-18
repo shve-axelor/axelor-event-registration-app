@@ -39,11 +39,6 @@ public class EventController extends JpaSupport {
 						"Registration Close Date Must be Grater Than Registration Open Date And Less Than Event Start Date");
 			}
 		}
-		if (event.getCapacity() != null && event.getEventRegistrationList() != null
-				&& !event.getEventRegistrationList().isEmpty()
-				&& event.getCapacity() < event.getEventRegistrationList().size()) {
-			response.setError("Capacity Cannot Set Less Than Total Number of Entrys.");
-		}
 		if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
 			int totalRegistrations = 0;
 			totalRegistrations = event.getEventRegistrationList().size() - 1;
@@ -95,7 +90,7 @@ public class EventController extends JpaSupport {
 		if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
 			totalRegistrations = event.getEventRegistrationList().size() - 1;
 		}
-		if (totalRegistrations == event.getCapacity() || event.getCapacity() == 0) {
+		if (totalRegistrations == event.getCapacity() && totalRegistrations != 0) {
 			response.setFlash("Total Number Of Registrations Are Exceeds Capacity");
 			eventRegistration1 = eventRegistrations.get(totalRegistrations);
 		} else {
