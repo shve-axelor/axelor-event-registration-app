@@ -60,11 +60,6 @@ public class EventServiceImpl implements EventService {
     BigDecimal totalAmountCollected = BigDecimal.ZERO;
     int totalEntry = 0;
     BigDecimal totalDiscount = BigDecimal.ZERO;
-    /*if(event != null) {
-    	totalAmountCollected = event.getAmountCollected();
-    	totalEntrys = event.getTotalEntry();
-    	totalDiscount = event.getTotalDiscount();
-    }*/
     if (event.getEventRegistrationList() != null) {
       for (EventRegistration eventRegistration : event.getEventRegistrationList()) {
         totalAmountCollected = totalAmountCollected.add(eventRegistration.getAmount());

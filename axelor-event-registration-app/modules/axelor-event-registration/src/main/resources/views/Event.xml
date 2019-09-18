@@ -19,7 +19,7 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
-		onSave="action-event-group-onchange-date,action-event-method-check-Dates"
+		onSave="action-event-group-onchange-date,action-event-method-check-Dates,action-event-method-validateEventRegistration"
 		onLoad="action-event-method-count-totalEntrys">
 		<toolbar>
 			<button name="btn-import-event-registrationBtn" title="Import Registration" readonlyIf="!id"

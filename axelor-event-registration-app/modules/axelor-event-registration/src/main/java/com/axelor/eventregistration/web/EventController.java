@@ -1,25 +1,30 @@
 package com.axelor.eventregistration.web;
 
-import com.axelor.data.ImportTask;
-import com.axelor.data.Importer;
-import com.axelor.data.csv.CSVImporter;
 import com.axelor.db.JpaSupport;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
+
+import com.axelor.eventregistration.service.EventRegistrationService;
 import com.axelor.eventregistration.service.EventService;
+import com.axelor.inject.Beans;
+
+import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.google.inject.Inject;
 
-import java.io.File;
-import java.io.IOException;
+import com.google.inject.Inject;
 import java.time.Period;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class EventController extends JpaSupport {
 
 	@Inject
 	EventService eventService;
+
+	@Inject
+	EventRegistrationService eventRegistrationService;
 
 	public void checkDates(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
@@ -92,23 +97,30 @@ public class EventController extends JpaSupport {
 			}
 		}
 		eventRegistrations.remove(eventRegistration1);
-		/*
-		 * if(eventRegistrations != null && !eventRegistrations.isEmpty()) {
-		 * response.setAttr("discountList", "readonly", true); }
-		 */
 		eventService.calculateTotalFields(event);
 		response.setValues(event);
 	}
 
 	public void setTotalEntrys(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
+		if(event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
+			List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
+			for(EventRegistration eventregistration: eventRegistrations) {
+				eventRegistrationService.calculateAmount(event, eventregistration);
+			}	
+		}
 		eventService.calculateTotalFields(event);
 		response.setValues(event);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void importEventRegistration(ActionRequest request, ActionResponse response) {
-		// Event event = request.getContext().asType(Event.class);
-		Importer importer = new CSVImporter("event-registration.xml","data/csv-multi");
-		importer.run();
+		LinkedHashMap<String, Object> map = (LinkedHashMap<String, Object>) request.getContext().get("metaFile");
+		MetaFile dataFile = Beans.get(MetaFileRepository.class).find(((Integer) map.get("id")).longValue());
+		try {
+			eventRegistrationService.importEventRegistration(dataFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
