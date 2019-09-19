@@ -36,6 +36,7 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -45,124 +46,110 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class GenerateMessageController {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  @Inject private TemplateMessageService templateMessageService;
+	@Inject
+	private TemplateMessageService templateMessageService;
 
-  @Inject private TemplateRepository templateRepo;
+	@Inject
+	private TemplateRepository templateRepo;
 
-  @Inject private MessageService messageService;
+	@Inject
+	private MessageService messageService;
 
-  public void callMessageWizard(ActionRequest request, ActionResponse response) {
+	public void callMessageWizard(ActionRequest request, ActionResponse response) {
 
-    Model context = request.getContext().asType(Model.class);
-    String model = request.getModel();
+		Model context = request.getContext().asType(Model.class);
+		String model = request.getModel();
 
-    LOG.debug("Call message wizard for model : {} ", model);
+		LOG.debug("Call message wizard for model : {} ", model);
 
-    String[] decomposeModel = model.split("\\.");
-    String simpleModel = decomposeModel[decomposeModel.length - 1];
+		String[] decomposeModel = model.split("\\.");
+		String simpleModel = decomposeModel[decomposeModel.length - 1];
 
-    Query<? extends Template> templateQuery =
-        templateRepo.all().filter("self.metaModel.fullName = ?1 AND self.isSystem != true", model);
+		try {
 
-    try {
+			Query<? extends Template> templateQuery = templateRepo.all()
+					.filter("self.metaModel.fullName = ?1 AND self.isSystem != true", model);
 
-      long templateNumber = templateQuery.count();
+			long templateNumber = templateQuery.count();
 
-      LOG.debug("Template number : {} ", templateNumber);
+			LOG.debug("Template number : {} ", templateNumber);
 
-      if (templateNumber == 0) {
+			if (templateNumber == 0) {
 
-        response.setView(
-            ActionView.define(I18n.get(IExceptionMessage.MESSAGE_3))
-                .model(Message.class.getName())
-                .add("form", "message-form")
-                .param("forceEdit", "true")
-                .context("_mediaTypeSelect", MessageRepository.MEDIA_TYPE_EMAIL)
-                .context("_templateContextModel", model)
-                .context("_objectId", context.getId().toString())
-                .map());
+				response.setView(ActionView.define(I18n.get(IExceptionMessage.MESSAGE_3)).model(Message.class.getName())
+						.add("form", "message-form").param("forceEdit", "true")
+						.context("_mediaTypeSelect", MessageRepository.MEDIA_TYPE_EMAIL)
+						.context("_templateContextModel", model).context("_objectId", context.getId().toString())
+						.map());
 
-      } else if (templateNumber > 1) {
+			} else if (templateNumber > 1) {
 
-        response.setView(
-            ActionView.define(I18n.get(IExceptionMessage.MESSAGE_2))
-                .model(Wizard.class.getName())
-                .add("form", "generate-message-wizard-form")
-                .param("show-confirm", "false")
-                .context("_objectId", context.getId().toString())
-                .context("_templateContextModel", model)
-                .context("_tag", simpleModel)
-                .map());
+				response.setView(ActionView.define(I18n.get(IExceptionMessage.MESSAGE_2)).model(Wizard.class.getName())
+						.add("form", "generate-message-wizard-form").param("show-confirm", "false")
+						.context("_objectId", context.getId().toString()).context("_templateContextModel", model)
+						.context("_tag", simpleModel).map());
 
-      } else {
-        response.setView(
-            generateMessage(context.getId(), model, simpleModel, templateQuery.fetchOne()));
-      }
+			} else {
+				response.setView(generateMessage(context.getId(), model, simpleModel, templateQuery.fetchOne(),
+						request.getContext()));
+			}
 
-    } catch (Exception e) {
-      TraceBackService.trace(response, e);
-    }
-    response.setValue("emailSent", true);
-  }
+		}
 
-  public void generateMessage(ActionRequest request, ActionResponse response) {
+		catch (Exception e) {
+			TraceBackService.trace(response, e);
+		}
+	}
 
-    Context context = request.getContext();
-    Map<?, ?> templateContext = (Map<?, ?>) context.get("_xTemplate");
-    Template template = null;
-    if (templateContext != null) {
-      template = templateRepo.find(Long.parseLong(templateContext.get("id").toString()));
-    }
+	public void generateMessage(ActionRequest request, ActionResponse response) {
 
-    Long objectId = Long.parseLong(context.get("_objectId").toString());
-    String model = (String) context.get("_templateContextModel");
-    String tag = (String) context.get("_tag");
+		Context context = request.getContext();
+		Map<?, ?> templateContext = (Map<?, ?>) context.get("_xTemplate");
+		Template template = null;
+		if (templateContext != null) {
+			template = templateRepo.find(Long.parseLong(templateContext.get("id").toString()));
+		}
 
-    try {
-      response.setView(generateMessage(objectId, model, tag, template));
-      response.setCanClose(true);
-    } catch (Exception e) {
-      TraceBackService.trace(response, e);
-    }
-  }
+		Long objectId = Long.parseLong(context.get("_objectId").toString());
+		String model = (String) context.get("_templateContextModel");
+		String tag = (String) context.get("_tag");
 
-  public Map<String, Object> generateMessage(
-      long objectId, String model, String tag, Template template)
-      throws SecurityException, NoSuchFieldException, ClassNotFoundException,
-          InstantiationException, IllegalAccessException, AxelorException, IOException {
+		try {
+			response.setView(generateMessage(objectId, model, tag, template, context));
+			response.setCanClose(true);
+		} catch (Exception e) {
+			TraceBackService.trace(response, e);
+		}
+	}
 
-    LOG.debug("template : {} ", template);
-    LOG.debug("object id : {} ", objectId);
-    LOG.debug("model : {} ", model);
-    LOG.debug("tag : {} ", tag);
-    Message message = null;
-    if (template != null) {
-      message = templateMessageService.generateMessage(objectId, model, tag, template);
-    } else {
-      message =
-          messageService.createMessage(
-              model,
-              Long.valueOf(objectId).intValue(),
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              MessageRepository.MEDIA_TYPE_EMAIL,
-              null);
-    }
+	public Map<String, Object> generateMessage(long objectId, String model, String tag, Template template,
+			Context context) throws SecurityException, NoSuchFieldException, ClassNotFoundException,
+			InstantiationException, IllegalAccessException, AxelorException, IOException {
 
-    return ActionView.define(I18n.get(IExceptionMessage.MESSAGE_3))
-        .model(Message.class.getName())
-        .add("form", "message-form")
-        .param("forceEdit", "true")
-        .context("_showRecord", message.getId().toString())
-        .map();
-  }
+		LOG.debug("template : {} ", template);
+		LOG.debug("object id : {} ", objectId);
+		LOG.debug("model : {} ", model);
+		LOG.debug("tag : {} ", tag);
+		Message message = null;
+		/*
+		 * String toRecipents = ""; if (context != null) { Event event =
+		 * context.asType(Event.class); List<EventRegistration> eventRegistrations =
+		 * event.getEventRegistrationList(); for (EventRegistration eventRegistration :
+		 * eventRegistrations) { toRecipents = toRecipents +
+		 * eventRegistration.getEmail() + ";"; } }
+		 */
+		if (template != null) {
+			// template.setToRecipients(toRecipents);
+			message = templateMessageService.generateMessage(objectId, model, tag, template);
+		} else {
+			message = messageService.createMessage(model, Long.valueOf(objectId).intValue(), null, null, null, null,
+					null, null, null, null, null, MessageRepository.MEDIA_TYPE_EMAIL, null);
+		}
+
+		return ActionView.define(I18n.get(IExceptionMessage.MESSAGE_3)).model(Message.class.getName())
+				.add("form", "message-form").param("forceEdit", "true")
+				.context("_showRecord", message.getId().toString()).map();
+	}
 }

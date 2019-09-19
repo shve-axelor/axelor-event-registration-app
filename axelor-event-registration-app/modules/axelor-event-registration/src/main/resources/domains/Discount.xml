@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.1.xsd">
 
 	<module package="com.axelor.event.registration.db" name="event-registration" />
-	
+
 	<entity name="Discount">
 		<integer name="beforeDays" min="0" title="Before Days" />
 		<decimal name="discountPercent" min="0" max="100" title="Discount Percent" />

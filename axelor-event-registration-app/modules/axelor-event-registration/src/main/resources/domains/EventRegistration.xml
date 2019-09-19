@@ -5,7 +5,8 @@
 	<module package="com.axelor.event.registration.db" name="event-registration" />
 
 	<entity name="EventRegistration">
-		<many-to-one name="event" required="true" title="Event" ref="com.axelor.event.registration.db.Event" />
+		<many-to-one name="event" required="true" title="Event"
+			ref="com.axelor.event.registration.db.Event" />
 		<string name="name" title="Name" />
 		<string name="email" title="Email" />
 		<many-to-one name="address" ref="com.axelor.event.registration.db.Address" title="Address" />

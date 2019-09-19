@@ -6,7 +6,10 @@ import com.axelor.meta.db.MetaFile;
 
 public interface EventRegistrationService {
   public void calculateAmount(Event event, EventRegistration eventregistration);
-  public void importEventRegistration(MetaFile dataFile);
+
+  public void importEventRegistration(MetaFile dataFile, Event event);
+
   public boolean checkEventCapacity(EventRegistration eventRegistration);
+
   public boolean checkEventRegistrationDate(EventRegistration eventRegistration);
 }

@@ -14,8 +14,9 @@
 		<integer name="capacity" min="0" title="Capacity" />
 		<decimal name="eventFees" min="0" title="Event fees" />
 		<string name="description" title="Description" />
-		<one-to-many name="discountList" title="Discounts" ref="com.axelor.event.registration.db.Discount"/>
-		<one-to-many name="eventRegistrationList" title="Event Registrations" mappedBy="event" ref="com.axelor.event.registration.db.EventRegistration"/>
+		<one-to-many name="discountList" title="Discounts" ref="com.axelor.event.registration.db.Discount" />
+		<one-to-many name="eventRegistrationList" title="Event Registrations" mappedBy="event"
+			ref="com.axelor.event.registration.db.EventRegistration" />
 		<integer name="totalEntry" title="Total Entry" readonly="true" />
 		<decimal name="amountCollected" title="Amount Collected" readonly="true" />
 		<decimal name="totalDiscount" title="Total Discount" readonly="true" />
