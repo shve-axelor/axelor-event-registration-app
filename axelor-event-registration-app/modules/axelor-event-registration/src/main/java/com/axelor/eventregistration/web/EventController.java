@@ -61,13 +61,13 @@ public class EventController {
   }
 
   public void setTotalEntrys(ActionRequest request, ActionResponse response) {
-    Event event = request.getContext().asType(Event.class);
+   /* Event event = request.getContext().asType(Event.class);
     if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
       List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
       for (EventRegistration eventregistration : eventRegistrations) {
         eventRegistrationService.calculateAmount(event, eventregistration);
       }
-    }
+    }*/
     //  eventService.calculateTotalFields(event);
     //  response.setValues(event);
   }

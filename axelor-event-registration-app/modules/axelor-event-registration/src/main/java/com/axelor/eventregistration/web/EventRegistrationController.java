@@ -2,7 +2,6 @@ package com.axelor.eventregistration.web;
 
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
-import com.axelor.event.registration.db.repo.EventRegistrationRepository;
 import com.axelor.event.registration.db.repo.EventRepository;
 import com.axelor.eventregistration.service.EventRegistrationService;
 import com.axelor.eventregistration.service.EventService;
@@ -17,8 +16,6 @@ public class EventRegistrationController {
   @Inject EventService eventService;
 
   @Inject EventRepository eventRepository;
-
-  @Inject EventRegistrationRepository eventRegistrationRepository;
 
   public void setEventField(ActionRequest request, ActionResponse response) {
     EventRegistration eventRegistration = request.getContext().asType(EventRegistration.class);
