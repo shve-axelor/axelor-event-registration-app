@@ -53,31 +53,17 @@ public class EventController {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  public void checkDates(ActionRequest request, ActionResponse response) {
+  public void validateEventRecord(ActionRequest request, ActionResponse response) {
     Event event = request.getContext().asType(Event.class);
-    if (event.getStartDate() != null && event.getEndDate() != null) {
-      if (eventService.checkEndDate(event)) {
-        response.setError("End Date Must be Greater Than Start Date");
-      } else if (event.getRegOpenDate() != null && eventService.checkRegOpenDate(event)) {
-        response.setError("Registration Open Date Must be Less Than Event Start Date");
-      } else if (event.getRegCloseDate() != null
-          && event.getRegOpenDate() != null
-          && eventService.checkRegCloseDate(event)) {
-        response.setError(
-            "Registration Close Date Must be Grater Than Registration Open Date And Less Than Event Start Date");
-      }
-    } else if (event.getEventRegistrationList() != null
-        && !event.getEventRegistrationList().isEmpty()) {
-      int totalRegistrations = 0;
-      totalRegistrations = event.getEventRegistrationList().size() - 1;
-
-      if (totalRegistrations == event.getCapacity() || event.getCapacity() == 0) {
+    if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
+      if (event.getCapacity() < event.getEventRegistrationList().size()) {
         response.setError("Total Number Of Registrations Are Exceeds Capacity");
-      }
-      for (EventRegistration eventRegistration : event.getEventRegistrationList()) {
-        if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
-          response.setError("Registration Date For event Must Be In Between Registration Period");
-          break;
+      } else {
+        for (EventRegistration eventRegistration : event.getEventRegistrationList()) {
+          if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
+            response.setError("Registration Date For event Must Be In Between Registration Period");
+            break;
+          }
         }
       }
     } else {
@@ -101,8 +87,8 @@ public class EventController {
         eventRegistrationService.calculateAmount(event, eventregistration);
       }
     }
-    eventService.calculateTotalFields(event);
-    response.setValues(event);
+    // eventService.calculateTotalFields(event);
+    // response.setValues(event);
   }
 
   public void setDiscountList(ActionRequest request, ActionResponse response) {
@@ -115,36 +101,23 @@ public class EventController {
         response.setFlash("Before Days not greater than " + period.getDays());
       }
     }
-    if (event.getDiscountList() != null && !event.getDiscountList().isEmpty()) {
-      response.setAttr("startDate", "readonly", true);
-      response.setAttr("regOpenDate", "readonly", true);
-      response.setAttr("regCloseDate", "readonly", true);
-    } else {
-      response.setAttr("startDate", "readonly", false);
-      response.setAttr("regOpenDate", "readonly", false);
-      response.setAttr("regCloseDate", "readonly", false);
-    }
   }
 
   public void checkEventRegistrationList(ActionRequest request, ActionResponse response) {
     Event event = request.getContext().asType(Event.class);
     List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
-    EventRegistration eventRegistration1 = new EventRegistration();
+    EventRegistration eventRegistration = new EventRegistration();
     int totalRegistrations = 0;
     if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
       totalRegistrations = event.getEventRegistrationList().size() - 1;
-    }
-    if (totalRegistrations == event.getCapacity() && totalRegistrations != 0) {
-      response.setFlash("Total Number Of Registrations Are Exceeds Capacity");
-      eventRegistration1 = eventRegistrations.get(totalRegistrations);
-    } else {
-      for (EventRegistration eventRegistration : eventRegistrations) {
-        if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
-          eventRegistration1 = eventRegistration;
-        }
+      eventRegistration = eventRegistrations.get(totalRegistrations);
+      if (totalRegistrations == event.getCapacity()) {
+        response.setFlash("Total Number Of Registrations Are Exceeds Capacity");
+        eventRegistrations.remove(eventRegistration);
+      } else if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
+        eventRegistrations.remove(eventRegistration);
       }
     }
-    eventRegistrations.remove(eventRegistration1);
     eventService.calculateTotalFields(event);
     response.setValues(event);
   }

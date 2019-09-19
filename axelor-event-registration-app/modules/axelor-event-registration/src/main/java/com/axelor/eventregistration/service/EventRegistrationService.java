@@ -9,7 +9,7 @@ public interface EventRegistrationService {
 
   public void importEventRegistration(MetaFile dataFile, Event event);
 
-  public boolean checkEventCapacity(EventRegistration eventRegistration);
+  public boolean checkEventCapacity(Event event);
 
   public boolean checkEventRegistrationDate(EventRegistration eventRegistration);
 }

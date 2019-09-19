@@ -32,7 +32,7 @@ public class EventRegistrationController {
   public void validateEventRegistration(ActionRequest request, ActionResponse response) {
     EventRegistration eventRegistration = request.getContext().asType(EventRegistration.class);
     if (eventRegistration.getEvent() != null) {
-      if (eventRegistrationService.checkEventCapacity(eventRegistration)) {
+      if (eventRegistrationService.checkEventCapacity(eventRegistration.getEvent())) {
         response.setError("Total Number Of Registrations Are Exceeds Capacity");
       } else if (eventRegistration.getRegistrationDate() != null
           && eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {

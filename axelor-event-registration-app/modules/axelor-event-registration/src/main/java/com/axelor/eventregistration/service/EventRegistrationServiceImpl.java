@@ -27,6 +27,7 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
   @Override
   public void calculateAmount(Event event, EventRegistration eventregistration) {
     List<Discount> discountList = event.getDiscountList();
+    int flag = 0;
     Period endPeriod =
         Period.between(
             eventregistration.getRegistrationDate().toLocalDate(), event.getRegCloseDate());
@@ -37,12 +38,12 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
       for (Discount discount : event.getDiscountList()) {
         if (endPeriod.getDays() >= discount.getBeforeDays()) {
           eventregistration.setAmount(event.getEventFees().subtract(discount.getDiscountAmount()));
+          flag = 1;
           break;
-        } else {
-          eventregistration.setAmount(event.getEventFees());
         }
       }
-    } else {
+    }
+    if (flag == 0) {
       eventregistration.setAmount(event.getEventFees());
     }
   }
@@ -121,9 +122,8 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
   }
 
   @Override
-  public boolean checkEventCapacity(EventRegistration eventRegistration) {
-    if (eventRegistration.getEvent().getCapacity()
-        == eventRegistration.getEvent().getEventRegistrationList().size()) {
+  public boolean checkEventCapacity(Event event) {
+    if (event.getCapacity() == event.getEventRegistrationList().size()) {
       return true;
     }
     return false;

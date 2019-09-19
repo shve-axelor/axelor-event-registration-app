@@ -11,31 +11,6 @@ import java.util.List;
 public class EventServiceImpl implements EventService {
 
   @Override
-  public boolean checkEndDate(Event event) {
-    if (event.getEndDate().compareTo(event.getStartDate()) <= 0) {
-      return true;
-    }
-    return false;
-  }
-
-  @Override
-  public boolean checkRegOpenDate(Event event) {
-    if (event.getStartDate().toLocalDate().compareTo(event.getRegOpenDate()) <= 0) {
-      return true;
-    }
-    return false;
-  }
-
-  @Override
-  public boolean checkRegCloseDate(Event event) {
-    if (event.getStartDate().toLocalDate().compareTo(event.getRegCloseDate()) <= 0
-        || event.getRegOpenDate().compareTo(event.getRegCloseDate()) >= 0) {
-      return true;
-    }
-    return false;
-  }
-
-  @Override
   public int setDiscountList(Event event) {
     Period period = Period.between(event.getRegOpenDate(), event.getRegCloseDate());
     List<Discount> discountList = event.getDiscountList();
