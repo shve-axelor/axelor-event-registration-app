@@ -53,25 +53,6 @@ public class EventController {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  public void validateEventRecord(ActionRequest request, ActionResponse response) {
-    Event event = request.getContext().asType(Event.class);
-    if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
-      if (event.getCapacity() < event.getEventRegistrationList().size()) {
-        response.setError("Total Number Of Registrations Are Exceeds Capacity");
-      } else {
-        for (EventRegistration eventRegistration : event.getEventRegistrationList()) {
-          if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
-            response.setError("Registration Date For event Must Be In Between Registration Period");
-            break;
-          }
-        }
-      }
-    } else {
-      eventService.calculateTotalFields(event);
-      response.setValues(event);
-    }
-  }
-
   public void calculateDiscount(ActionRequest request, ActionResponse response) {
     Event event = request.getContext().asType(Event.class);
     if (event.getEventFees().intValue() == 0) {
@@ -148,17 +129,22 @@ public class EventController {
     assert bean instanceof EventRegistration;
     EventRegistration eventRegistration = (EventRegistration) bean;
     Event event = (Event) context.get("_event");
-    eventRegistration.setEvent(event);
-    List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
-    if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)
-        || eventRegistrationService.checkEventCapacity(event)) {
-      bean = null;
+    if (eventRegistration.getRegistrationDate() != null) {
+      eventRegistration.setEvent(event);
+      List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
+      if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)
+          || eventRegistrationService.checkEventCapacity(event)) {
+        bean = null;
+      } else {
+        eventRegistrationService.calculateAmount(event, eventRegistration);
+        eventRegistrations.add(eventRegistration);
+        event.setEventRegistrationList(eventRegistrations);
+        eventService.calculateTotalFields(event);
+      }
     } else {
-      eventRegistrationService.calculateAmount(event, eventRegistration);
-      eventRegistrations.add(eventRegistration);
-      event.setEventRegistrationList(eventRegistrations);
-      eventService.calculateTotalFields(event);
+      bean = null;
     }
+
     return bean;
   }
 

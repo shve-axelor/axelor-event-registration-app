@@ -19,7 +19,7 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
-		onSave="action-event-group-onchange-date,action-event-method-validate-event-record" onLoad="action-event-method-count-totalEntrys">
+		onSave="action-event-group-onchange-date" onLoad="action-event-method-count-totalEntrys">
 		<toolbar>
 			<button name="btn-import-event-registrationBtn" title="Import Registration" readonlyIf="!id"
 				onClick="action-event-view-import-registration-popup" />
@@ -89,10 +89,6 @@
 
 	<action-method name="action-event-method-checkEventRegistrationList">
 		<call class="com.axelor.eventregistration.web.EventController" method="checkEventRegistrationList" />
-	</action-method>
-
-	<action-method name="action-event-method-validate-event-record">
-		<call class="com.axelor.eventregistration.web.EventController" method="validateEventRecord" />
 	</action-method>
 
 	<action-method name="action-event-method-setDiscountList">
