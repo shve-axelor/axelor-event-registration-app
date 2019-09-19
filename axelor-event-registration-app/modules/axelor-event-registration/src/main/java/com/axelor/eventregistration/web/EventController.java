@@ -87,8 +87,8 @@ public class EventController {
         eventRegistrationService.calculateAmount(event, eventregistration);
       }
     }
-    // eventService.calculateTotalFields(event);
-    // response.setValues(event);
+    //  eventService.calculateTotalFields(event);
+    //  response.setValues(event);
   }
 
   public void setDiscountList(ActionRequest request, ActionResponse response) {
@@ -132,7 +132,13 @@ public class EventController {
         Beans.get(EventRepository.class)
             .find(((Integer) request.getContext().get("_event")).longValue());
     try {
-      eventRegistrationService.importEventRegistration(dataFile, event);
+      if (dataFile.getFileType().equals("text/csv")) {
+        eventRegistrationService.importEventRegistration(dataFile, event);
+        response.setFlash("Event Registration Imported Successfully");
+      } else {
+        response.setError("Invalid File Format");
+      }
+
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -143,7 +149,16 @@ public class EventController {
     EventRegistration eventRegistration = (EventRegistration) bean;
     Event event = (Event) context.get("_event");
     eventRegistration.setEvent(event);
-    eventRegistrationService.calculateAmount(event, eventRegistration);
+    List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
+    if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)
+        || eventRegistrationService.checkEventCapacity(event)) {
+      bean = null;
+    } else {
+      eventRegistrationService.calculateAmount(event, eventRegistration);
+      eventRegistrations.add(eventRegistration);
+      event.setEventRegistrationList(eventRegistrations);
+      eventService.calculateTotalFields(event);
+    }
     return bean;
   }
 
