@@ -10,6 +10,7 @@ import com.axelor.apps.message.service.MessageService;
 import com.axelor.apps.message.service.TemplateMessageService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.Model;
+import com.axelor.event.registration.db.Discount;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
 import com.axelor.event.registration.db.repo.EventRepository;
@@ -53,34 +54,45 @@ public class EventController {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  public void calculateDiscount(ActionRequest request, ActionResponse response) {
-    Event event = request.getContext().asType(Event.class);
-    if (event.getEventFees().intValue() == 0) {
-      event.setDiscountList(null);
-    }
-  }
-
-  public void setTotalEntrys(ActionRequest request, ActionResponse response) {
-   /* Event event = request.getContext().asType(Event.class);
-    if (event.getEventRegistrationList() != null && !event.getEventRegistrationList().isEmpty()) {
-      List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
-      for (EventRegistration eventregistration : eventRegistrations) {
-        eventRegistrationService.calculateAmount(event, eventregistration);
-      }
-    }*/
-    //  eventService.calculateTotalFields(event);
-    //  response.setValues(event);
-  }
-
   public void setDiscountList(ActionRequest request, ActionResponse response) {
     Event event = request.getContext().asType(Event.class);
     Period period = Period.between(event.getRegOpenDate(), event.getRegCloseDate());
-    if (event.getRegOpenDate() != null && event.getRegCloseDate() != null) {
-      int flag = eventService.setDiscountList(event);
-      response.setValues(event);
-      if (flag == 1) {
+    Discount discount = new Discount();
+    if (event.getDiscountList() != null && !event.getDiscountList().isEmpty()) {
+      int lastDiscount = 0;
+      lastDiscount = event.getDiscountList().size() - 1;
+      discount = event.getDiscountList().get(lastDiscount);
+      if (discount.getBeforeDays() > period.getDays()) {
         response.setFlash("Before Days not greater than " + period.getDays());
+        event.getDiscountList().remove(discount);
+      } else {
+        event.setDiscountList(eventService.calculateDiscountList(event));
       }
+      response.setAttr("startDate", "readonly", true);
+      response.setAttr("regOpenDate", "readonly", true);
+      response.setAttr("regCloseDate", "readonly", true);
+      response.setAttr("eventFees", "readonly", true);
+      response.setValues(event);
+    }else {
+      response.setAttr("startDate", "readonly", false);
+      response.setAttr("regOpenDate", "readonly", false);
+      response.setAttr("regCloseDate", "readonly", false);
+      response.setAttr("eventFees", "readonly", false);
+    }
+  }
+
+  public void setFieldsReadOnly(ActionRequest request, ActionResponse response) {
+    Event event = request.getContext().asType(Event.class);
+    if (event.getDiscountList() != null && !event.getDiscountList().isEmpty()) {
+      response.setAttr("startDate", "readonly", true);
+      response.setAttr("regOpenDate", "readonly", true);
+      response.setAttr("regCloseDate", "readonly", true);
+      response.setAttr("eventFees", "readonly", true);
+    } else {
+      response.setAttr("startDate", "readonly", false);
+      response.setAttr("regOpenDate", "readonly", false);
+      response.setAttr("regCloseDate", "readonly", false);
+      response.setAttr("eventFees", "readonly", false);
     }
   }
 
@@ -99,6 +111,7 @@ public class EventController {
         eventRegistrations.remove(eventRegistration);
       }
     }
+    event.setEventRegistrationList(eventRegistrations);
     eventService.calculateTotalFields(event);
     response.setValues(event);
   }
@@ -184,6 +197,7 @@ public class EventController {
           response.setError("Email Is Not Sent");
         } else {
           messageService.sendMessage(message);
+          response.setValue("emailSent", true);
           response.setReload(true);
           response.setFlash(I18n.get(IExceptionMessage.MESSAGE_4));
         }

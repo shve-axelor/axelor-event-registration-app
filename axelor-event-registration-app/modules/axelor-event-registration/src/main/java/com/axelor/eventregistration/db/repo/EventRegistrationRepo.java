@@ -10,9 +10,15 @@ public class EventRegistrationRepo extends EventRegistrationRepository {
   
   @Inject EventService eventService;
   
+  @Inject EventRegistrationRepository eventRegistrationRepo;
+  
   @Override
   public EventRegistration save(EventRegistration entity) {
     Event event = entity.getEvent();
+    /*EventRegistration eventRegistration = eventRegistrationRepo.find(Long.parseLong(""+entity.getId())) ;
+    if(eventRegistration != null) {
+      
+    }*/
     eventService.calculateTotalFields(event);
     entity.setEvent(event);
     return super.save(entity);

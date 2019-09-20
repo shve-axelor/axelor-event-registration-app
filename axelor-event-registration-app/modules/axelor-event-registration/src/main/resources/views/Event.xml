@@ -19,7 +19,7 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
-		onSave="action-event-group-onchange-date" onLoad="action-event-method-count-totalEntrys">
+		onSave="action-event-group-onchange-date" onLoad="action-event-method-set-fields-readonly">
 		<toolbar>
 			<button name="btn-import-event-registrationBtn" title="Import Registration" readonlyIf="!id"
 				onClick="action-event-view-import-registration-popup" />
@@ -33,9 +33,10 @@
 			<field name="startDate" onChange="action-event-validate-onchange-startDate" />
 			<field name="endDate" onChange="action-event-validate-onchange-endDate" />
 			<field name="regOpenDate" onChange="action-event-validate-onchange-regOpenDate" />
-			<field name="regCloseDate" onChange="action-event-validate-onchange-regCloseDate" />
 			<field name="capacity" />
-			<field name="eventFees" onChange="action-event-method-calculate-discount" />
+			<field name="regCloseDate" onChange="action-event-validate-onchange-regCloseDate" />
+			
+			<field name="eventFees" />
 		</panel>
 		<panel title="Discount Details">
 			<field name="discountList"
@@ -82,10 +83,9 @@
 		</panel>
 	</form>
 
-
-	<action-method name="action-event-method-count-totalEntrys">
-		<call class="com.axelor.eventregistration.web.EventController" method="setTotalEntrys" />
-	</action-method>
+<action-method name="action-event-method-set-fields-readonly">
+	<call class="com.axelor.eventregistration.web.EventController" method="setFieldsReadOnly"/>
+</action-method>
 
 	<action-method name="action-event-method-checkEventRegistrationList">
 		<call class="com.axelor.eventregistration.web.EventController" method="checkEventRegistrationList" />

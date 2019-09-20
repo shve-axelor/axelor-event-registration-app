@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+	<grid model="com.axelor.event.registration.db.Discount" title="Discount" name="discount-grid">
+		<field name="beforeDays" />
+		<field name="discountPercent" />
+		<field name="discountAmount" />
+	</grid>
+	<form model="com.axelor.event.registration.db.Discount" title="Discount" name="discount-form">
+		<panel title="Discount Details">
+			<field name="beforeDays" />
+			<field name="discountPercent" />
+		</panel>
+		<panel title="Discount" sidebar="true">
+			<field name="discountAmount" />
+		</panel>
+	</form>
+</object-views>
