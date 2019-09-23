@@ -9,11 +9,11 @@
 		<field name="discountAmount" />
 	</grid>
 	<form model="com.axelor.event.registration.db.Discount" title="Discount" name="discount-form">
-		<panel title="Discount Details">
+		<panel name="discountDetailsPanel" title="Discount Details">
 			<field name="beforeDays" />
 			<field name="discountPercent" />
 		</panel>
-		<panel title="Discount" sidebar="true">
+		<panel name="discountPanel" title="Discount" sidebar="true">
 			<field name="discountAmount" />
 		</panel>
 	</form>

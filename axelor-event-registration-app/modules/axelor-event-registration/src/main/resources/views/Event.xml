@@ -21,32 +21,32 @@
 	<form model="com.axelor.event.registration.db.Event" title="Event" name="event-form"
 		onSave="action-event-group-onchange-date" onLoad="action-event-method-set-fields-readonly">
 		<toolbar>
-			<button name="btn-import-event-registrationBtn" title="Import Registration" readonlyIf="!id"
+			<button name="registrationBtn" title="Import Registration" readonlyIf="!id"
 				onClick="action-event-view-import-registration-popup" />
-			<button name="btn-print-event-report" showIf="id"
+			<button name="reportPrintBtn" showIf="id"
 				onClick="action-event-registration-event-report-print" title="Print" />
 			<button name="sendByEmailBtn" title="Send email" icon="fa-envelope"
-				onClick="action-event-method-sendEmailFromEvent,save" />
+				onClick="action-event-method-send-email-from-event,save" />
 		</toolbar>
-		<panel title="Event Details">
+		<panel name="eventDetailsPanel" title="Event Details">
 			<field name="reference" />
-			<field name="startDate" onChange="action-event-validate-onchange-startDate" />
-			<field name="endDate" onChange="action-event-validate-onchange-endDate" />
-			<field name="regOpenDate" onChange="action-event-validate-onchange-regOpenDate" />
+			<field name="startDate" onChange="action-event-validate-onchange-start-date" />
+			<field name="endDate" onChange="action-event-validate-onchange-end-date" />
+			<field name="regOpenDate" onChange="action-event-validate-onchange-reg-open-date" />
 			<field name="capacity" />
-			<field name="regCloseDate" onChange="action-event-validate-onchange-regCloseDate" />
-			
+			<field name="regCloseDate" onChange="action-event-validate-onchange-reg-close-date" />
+
 			<field name="eventFees" />
 		</panel>
-		<panel title="Discount Details">
+		<panel name="discountDetailsPanel" title="Discount Details">
 			<field name="discountList"
 				readonlyIf="eventFees == 0.00 || startDate == null || endDate ==  null || regOpenDate == null || regCloseDate == null"
-				onChange="action-event-method-setDiscountList" colSpan="12" />
+				onChange="action-event-method-set-discount-list" colSpan="12" />
 		</panel>
-		<panel title="Event Registration Details">
-			<panel-related field="eventRegistrationList"
+		<panel name="eventRegistrationDetailsPanel" title="Event Registration Details">
+			<panel-related name="eventRegistrationListPanel" field="eventRegistrationList"
 				readonlyIf="reference == null || eventFees == 0.00 || startDate == null || endDate ==  null || regOpenDate == null || regCloseDate == null"
-				colSpan="12" onChange="action-event-method-checkEventRegistrationList">
+				colSpan="12" onChange="action-event-method-check-event-registration-list">
 				<field name="name" />
 				<field name="email" />
 				<field name="registrationDate" />
@@ -54,22 +54,22 @@
 				<field name="address" />
 			</panel-related>
 		</panel>
-		<panel title="Description">
+		<panel name="descriptionPanel" title="Description">
 			<field name="description" widget="html" colSpan="12" />
 		</panel>
 		<panel sidebar="true">
 			<field name="createdOn" />
 			<field name="updatedOn" />
 		</panel>
-		<panel sidebar="true" title="Calculations">
+		<panel name="calculationsPanel" sidebar="true" title="Calculations">
 			<field name="totalEntry" />
 			<field name="amountCollected" />
 			<field name="totalDiscount" />
 		</panel>
-		<panel title="Venue" sidebar="true">
+		<panel name="addressPanel" title="Venue" sidebar="true">
 			<field name="address" />
 		</panel>
-		<panel sidebar="true">
+		<panel name="emailSentPanel" sidebar="true">
 			<field name="emailSent" />
 		</panel>
 	</form>
@@ -83,15 +83,15 @@
 		</panel>
 	</form>
 
-<action-method name="action-event-method-set-fields-readonly">
-	<call class="com.axelor.eventregistration.web.EventController" method="setFieldsReadOnly"/>
-</action-method>
+	<action-method name="action-event-method-set-fields-readonly">
+		<call class="com.axelor.eventregistration.web.EventController" method="setFieldsReadOnly" />
+	</action-method>
 
-	<action-method name="action-event-method-checkEventRegistrationList">
+	<action-method name="action-event-method-check-event-registration-list">
 		<call class="com.axelor.eventregistration.web.EventController" method="checkEventRegistrationList" />
 	</action-method>
 
-	<action-method name="action-event-method-setDiscountList">
+	<action-method name="action-event-method-set-discount-list">
 		<call class="com.axelor.eventregistration.web.EventController" method="setDiscountList" />
 	</action-method>
 
@@ -99,7 +99,7 @@
 		<call class="com.axelor.eventregistration.web.EventController" method="calculateDiscount" />
 	</action-method>
 
-	<action-method name="action-event-method-sendEmailFromEvent">
+	<action-method name="action-event-method-send-email-from-event">
 		<call class="com.axelor.eventregistration.web.EventController" method="sendEmailFromEvent" />
 	</action-method>
 
@@ -109,28 +109,28 @@
 
 
 	<action-group name="action-event-group-onchange-date">
-		<action name="action-event-validate-onchange-startDate" if="startDate != null" />
-		<action name="action-event-validate-onchange-endDate" if="endDate != null" />
-		<action name="action-event-validate-onchange-regOpenDate" if="regOpenDate != null" />
-		<action name="action-event-validate-onchange-regCloseDate" if="regCloseDate != null" />
+		<action name="action-event-validate-onchange-start-date" if="startDate != null" />
+		<action name="action-event-validate-onchange-end-date" if="endDate != null" />
+		<action name="action-event-validate-onchange-reg-open-date" if="regOpenDate != null" />
+		<action name="action-event-validate-onchange-reg-close-date" if="regCloseDate != null" />
 	</action-group>
 
 
-	<action-validate name="action-event-validate-onchange-startDate">
+	<action-validate name="action-event-validate-onchange-start-date">
 		<error message="Event Start Date Must Be In Future" if="eval: startDate &lt; LocalDateTime.now();" />
 	</action-validate>
 
-	<action-validate name="action-event-validate-onchange-endDate">
+	<action-validate name="action-event-validate-onchange-end-date">
 		<error message="Event End Date Must Be In Future" if="eval: endDate &lt; LocalDateTime.now();" />
 		<error message="End Date Must be Greater Than Start Date" if="eval: endDate &lt;= startDate" />
 	</action-validate>
 
-	<action-validate name="action-event-validate-onchange-regOpenDate">
+	<action-validate name="action-event-validate-onchange-reg-open-date">
 		<error message="Registration Open Date Must Be In Future" if="eval: regOpenDate &lt; LocalDate.now();" />
 		<error message="Registration Open Date Must be Less Than Event Start Date" if="eval: startDate.toLocalDate() &lt;= regOpenDate" />
 	</action-validate>
 
-	<action-validate name="action-event-validate-onchange-regCloseDate">
+	<action-validate name="action-event-validate-onchange-reg-close-date">
 		<error message="Registration Close Date Must Be In Future" if="eval: regCloseDate &lt; LocalDate.now();" />
 		<error
 			message="Registration Close Date Must be Grater Than Or Equal To Registration Open Date And Less Than Event Start Date"
@@ -147,14 +147,12 @@
 		<view-param name="show-confirm" value="false" />
 		<view-param name="popup-save" value="false" />
 		<view-param name="popup" value="reload" />
-		<context name="_event" expr="eval: id" />
 	</action-view>
 
 
-	<action-report output="in-${date}${time}" name="action-event-registration-event-report-print"
+	<action-report output="ev-${date}${time}" name="action-event-registration-event-report-print"
 		design="Event.rptdesign" format="pdf">
 		<param name="eventId" expr="eval: id" />
-		<!-- <param name="attachment" expr="eval: attachment" /> -->
 	</action-report>
 
 </object-views>

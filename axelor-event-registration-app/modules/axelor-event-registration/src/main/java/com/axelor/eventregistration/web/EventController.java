@@ -9,7 +9,6 @@ import com.axelor.apps.message.exception.IExceptionMessage;
 import com.axelor.apps.message.service.MessageService;
 import com.axelor.apps.message.service.TemplateMessageService;
 import com.axelor.auth.AuthUtils;
-import com.axelor.db.Model;
 import com.axelor.event.registration.db.Discount;
 import com.axelor.event.registration.db.Event;
 import com.axelor.event.registration.db.EventRegistration;
@@ -21,7 +20,6 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
-import com.axelor.meta.db.repo.MetaModelRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.inject.Inject;
@@ -40,17 +38,11 @@ public class EventController {
 
   @Inject private TemplateMessageService templateMessageService;
 
-  @Inject private TemplateRepository templateRepository;
-
-  @Inject MessageService messageService;
-
-  @Inject MetaModelRepository metaModelRepository;
+  @Inject private MessageService messageService;
 
   @Inject private EventService eventService;
 
   @Inject private EventRegistrationService eventRegistrationService;
-
-  @Inject private EmailAccountRepository emailAccountRepository;
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -73,7 +65,7 @@ public class EventController {
       response.setAttr("regCloseDate", "readonly", true);
       response.setAttr("eventFees", "readonly", true);
       response.setValues(event);
-    }else {
+    } else {
       response.setAttr("startDate", "readonly", false);
       response.setAttr("regOpenDate", "readonly", false);
       response.setAttr("regCloseDate", "readonly", false);
@@ -124,7 +116,7 @@ public class EventController {
         Beans.get(MetaFileRepository.class).find(((Integer) map.get("id")).longValue());
     Event event =
         Beans.get(EventRepository.class)
-            .find(((Integer) request.getContext().get("_event")).longValue());
+            .find(((Integer) request.getContext().get("_id")).longValue());
     try {
       if (dataFile.getFileType().equals("text/csv")) {
         eventRegistrationService.importEventRegistration(dataFile, event);
@@ -163,9 +155,9 @@ public class EventController {
 
   @SuppressWarnings("unused")
   public void sendEmailFromEvent(ActionRequest request, ActionResponse response) {
-    Model context = request.getContext().asType(Model.class);
-    String model = request.getModel();
     Event event = request.getContext().asType(Event.class);
+    String model = request.getModel();
+    
 
     LOG.debug("Call message wizard for model : {} ", model);
 
@@ -174,22 +166,25 @@ public class EventController {
 
     try {
       Template template =
-          templateRepository
+          Beans.get(TemplateRepository.class)
               .all()
               .filter("self.metaModel.fullName = ?1 AND self.isSystem != true", model)
               .fetchOne();
-      EmailAccount emailAccount = emailAccountRepository.all().fetchOne();
+
+      EmailAccount emailAccount = Beans.get(EmailAccountRepository.class).all().fetchOne();
       if (template != null && emailAccount != null) {
         Message message = null;
         String toRecipents = "";
         List<EventRegistration> eventRegistrations = event.getEventRegistrationList();
         for (EventRegistration eventRegistration : eventRegistrations) {
-          toRecipents = toRecipents + eventRegistration.getEmail() + ";";
+          if(eventRegistration.getEmail() != null) {
+            toRecipents = toRecipents + eventRegistration.getEmail() + ";";
+          }
         }
         template.setToRecipients(toRecipents);
-        message =
+        message = 
             templateMessageService.generateMessage(
-                Long.parseLong(context.getId().toString()), model, simpleModel, template);
+                Long.parseLong(event.getId().toString()), model, simpleModel, template);
         message.setSentDateT(LocalDateTime.now());
         message.setSenderUser(AuthUtils.getUser());
         message.setMailAccount(emailAccount);

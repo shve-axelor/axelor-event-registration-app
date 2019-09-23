@@ -47,14 +47,12 @@ public class EventRegistrationController {
     if (request.getContext().getParent() != null) {
       event = request.getContext().getParent().asType(Event.class);
     }
-    if (eventRegistration.getEvent() != null) {
-      if (eventRegistration.getRegistrationDate() != null) {
+    if (eventRegistration.getEvent() != null && eventRegistration.getRegistrationDate() != null) {
         if (eventRegistrationService.checkEventRegistrationDate(eventRegistration)) {
           response.setError("Registration Date For event Must Be In Between Registration Period");
         } else {
           eventRegistrationService.calculateAmount(event, eventRegistration);
-        }
-      }
+        }     
       response.setValues(eventRegistration);
     }
   }

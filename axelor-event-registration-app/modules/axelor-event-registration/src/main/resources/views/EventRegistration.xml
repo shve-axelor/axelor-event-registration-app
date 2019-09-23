@@ -14,29 +14,29 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.EventRegistration" title="Event Registration"
-		name="event-registration-form" onNew="action-event-method-event-registration-setEventField"
-		onSave="action-event-method-validateEventRegistration">
-		<panel title="Event Registration Details">
+		name="event-registration-form" onNew="action-event-method-event-registration-set-event-field"
+		onSave="action-event-method-validate-event-registration">
+		<panel name="eventRegistrationDetailsPanel" title="Event Registration Details">
 			<field name="name" />
 			<field name="email"
 				pattern="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@+[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"
 				widget="Email" placeholder="user@mydomain.com" />
 			<field name="registrationDate" onChange="action-event-method-calculate-amount" />
-			<field name="event" onChange="action-event-method-validateEventRegistration" />
+			<field name="event" onChange="action-event-method-validate-event-registration" />
 		</panel>
-		<panel title="Address Details">
+		<panel name="addressDetailsPanel" title="Address Details">
 			<field name="address" colSpan="12" />
 		</panel>
 		<panel sidebar="true">
 			<field name="createdOn" />
 			<field name="updatedOn" />
 		</panel>
-		<panel sidebar="true" name="eventDetails" title="Event Amount Details">
+		<panel sidebar="true" name="eventDetailsPanel" title="Event Amount Details">
 			<field name="amount" />
 		</panel>
 	</form>
 
-	<action-method name="action-event-method-validateEventRegistration">
+	<action-method name="action-event-method-validate-event-registration">
 		<call class="com.axelor.eventregistration.web.EventRegistrationController" method="validateEventRegistration" />
 	</action-method>
 
@@ -44,7 +44,7 @@
 		<call class="com.axelor.eventregistration.web.EventRegistrationController" method="calculateAmountField" />
 	</action-method>
 
-	<action-method name="action-event-method-event-registration-setEventField">
+	<action-method name="action-event-method-event-registration-set-event-field">
 		<call class="com.axelor.eventregistration.web.EventRegistrationController" method="setEventField" />
 	</action-method>
 </object-views>

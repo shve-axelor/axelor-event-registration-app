@@ -1233,6 +1233,11 @@ where er.event = ?;]]></xml-property>
 </model:DesignValues>]]></xml-property>
         </oda-data-set>
     </data-sets>
+    <styles>
+        <style name="NewStyle" id="86">
+            <property name="borderRightStyle">solid</property>
+        </style>
+    </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
             <property name="headerHeight">1.7in</property>
@@ -1617,126 +1622,104 @@ where er.event = ?;]]></xml-property>
                     <expression name="expression" type="javascript">dataSetRow["street"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">Aggregation</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["amount"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
             </list-property>
-            <column id="77"/>
-            <column id="78"/>
-            <column id="79"/>
-            <column id="80"/>
-            <column id="81"/>
+            <column id="90">
+                <property name="style">NewStyle</property>
+            </column>
+            <column id="77">
+                <property name="style">NewStyle</property>
+            </column>
+            <column id="78">
+                <property name="style">NewStyle</property>
+            </column>
+            <column id="79">
+                <property name="style">NewStyle</property>
+            </column>
+            <column id="80">
+                <property name="style">NewStyle</property>
+            </column>
             <header>
                 <row id="49">
                     <property name="borderBottomStyle">solid</property>
-                    <property name="borderBottomWidth">thin</property>
-                    <property name="borderTopStyle">solid</property>
-                    <property name="borderTopWidth">thin</property>
-                    <cell id="50">
-                        <label id="51">
-                            <property name="fontSize">12pt</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
-                            <text-property name="text">Amount</text-property>
-                        </label>
-                    </cell>
-                    <cell id="52">
-                        <label id="53">
-                            <property name="fontSize">12pt</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
-                            <text-property name="text">Email</text-property>
-                        </label>
-                    </cell>
-                    <cell id="54">
+                    <property name="borderBottomWidth">medium</property>
+                    <cell id="87">
                         <label id="55">
                             <property name="fontSize">12pt</property>
                             <property name="fontWeight">bold</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
                             <text-property name="text">Name</text-property>
                         </label>
                     </cell>
-                    <cell id="56">
+                    <cell id="50">
+                        <label id="53">
+                            <property name="fontSize">12pt</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Email</text-property>
+                        </label>
+                    </cell>
+                    <cell id="52">
                         <label id="57">
                             <property name="fontSize">12pt</property>
                             <property name="fontWeight">bold</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
                             <text-property name="text">Registration Date</text-property>
                         </label>
                     </cell>
-                    <cell id="58">
+                    <cell id="54">
                         <label id="59">
                             <property name="fontSize">12pt</property>
                             <property name="fontWeight">bold</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
                             <text-property name="text">Address</text-property>
+                        </label>
+                    </cell>
+                    <cell id="56">
+                        <label id="51">
+                            <property name="fontSize">12pt</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Amount</text-property>
                         </label>
                     </cell>
                 </row>
             </header>
             <detail>
                 <row id="60">
-                    <property name="borderTopStyle">solid</property>
-                    <property name="borderTopWidth">thin</property>
-                    <cell id="61">
-                        <data id="62">
-                            <property name="fontSize">12pt</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
-                            <property name="textAlign">center</property>
-                            <property name="resultSetColumn">amount</property>
-                        </data>
-                    </cell>
-                    <cell id="63">
-                        <data id="64">
-                            <property name="fontSize">12pt</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
-                            <property name="textAlign">center</property>
-                            <property name="resultSetColumn">email</property>
-                        </data>
-                    </cell>
-                    <cell id="65">
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <cell id="88">
                         <data id="66">
                             <property name="fontSize">12pt</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
                             <property name="textAlign">center</property>
                             <property name="resultSetColumn">name</property>
                         </data>
                     </cell>
-                    <cell id="67">
+                    <cell id="61">
+                        <data id="64">
+                            <property name="fontSize">12pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">email</property>
+                        </data>
+                    </cell>
+                    <cell id="63">
                         <data id="68">
                             <property name="fontSize">12pt</property>
-                            <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">thin</property>
-                            <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">thin</property>
                             <property name="textAlign">center</property>
                             <property name="resultSetColumn">registration_date</property>
                         </data>
                     </cell>
-                    <cell id="69">
+                    <cell id="65">
                         <text-data id="84">
                             <property name="fontSize">12pt</property>
+                            <property name="textAlign">center</property>
                             <list-property name="visibility">
                                 <structure>
                                     <property name="format">all</property>
@@ -1747,15 +1730,60 @@ where er.event = ?;]]></xml-property>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
+                    <cell id="67">
+                        <data id="62">
+                            <property name="fontSize">12pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">amount</property>
+                        </data>
+                    </cell>
                 </row>
             </detail>
             <footer>
                 <row id="71">
-                    <cell id="72"/>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">medium</property>
+                    <cell id="89">
+                        <label id="91">
+                            <property name="fontSize">12pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Total Entrys: </text-property>
+                        </label>
+                    </cell>
+                    <cell id="72">
+                        <text-data id="93">
+                            <property name="fontSize">12pt</property>
+                            <property name="textAlign">center</property>
+                            <property name="dataSet">EventDS</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">total_entry</property>
+                                    <text-property name="displayName">total_entry</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["total_entry"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">row["total_entry"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
                     <cell id="73"/>
-                    <cell id="74"/>
-                    <cell id="75"/>
-                    <cell id="76"/>
+                    <cell id="74">
+                        <label id="94">
+                            <property name="fontSize">12pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text-property name="text">Total Amount:</text-property>
+                        </label>
+                    </cell>
+                    <cell id="75">
+                        <property name="fontSize">12pt</property>
+                        <property name="textAlign">center</property>
+                        <data id="95">
+                            <property name="resultSetColumn">Aggregation</property>
+                        </data>
+                    </cell>
                 </row>
             </footer>
         </table>

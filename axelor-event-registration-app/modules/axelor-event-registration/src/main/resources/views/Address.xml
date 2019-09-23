@@ -12,7 +12,7 @@
 	</grid>
 
 	<form model="com.axelor.event.registration.db.Address" title="Address" name="address-form">
-		<panel title="Address Details">
+		<panel name="addressDetailsPanel" title="Address Details">
 			<field name="flatHouseNo" />
 			<field name="street" />
 			<field name="landmark" colSpan="4" />
